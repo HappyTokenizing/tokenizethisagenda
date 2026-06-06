@@ -214,9 +214,9 @@
   .jumphint .ar{color:var(--accent)}
 
   /* ---------- floating finder ---------- */
-  .finder{position:fixed;top:13px;left:50%;transform:translateX(-50%);z-index:40;
+  .finder{position:fixed;bottom:64px;right:18px;z-index:40;
     display:flex;align-items:center;gap:7px;
-    width:min(380px,calc(100vw - 540px));
+    width:min(380px,calc(100vw - 36px));
     background:rgba(255,255,255,.9);backdrop-filter:blur(16px) saturate(180%);
     -webkit-backdrop-filter:blur(16px) saturate(180%);
     border:1px solid var(--line);border-radius:999px;padding:6px 7px 6px 14px;
@@ -303,7 +303,7 @@
   .pvtoggle .d{width:7px;height:7px;border-radius:50%;background:var(--faint)}
   .pvtoggle.on .d{background:var(--accent);box-shadow:0 0 0 3px rgba(232,51,28,.16)}
 
-  .pvpanel{position:fixed;bottom:62px;right:18px;z-index:30;width:min(340px,calc(100vw - 36px));
+  .pvpanel{position:fixed;bottom:116px;right:18px;z-index:30;width:min(340px,calc(100vw - 36px));
     background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;
     box-shadow:0 24px 60px -28px rgba(0,0,0,.4);display:none}
   .pvpanel.show{display:block}
