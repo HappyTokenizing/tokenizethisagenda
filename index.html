@@ -618,9 +618,14 @@ input.err,.nf-row.err{animation:shake .4s}
 .tw-media .tw-illu{position:absolute;inset:0;width:100%;height:100%}
 .tw-stats{display:flex;gap:14px;margin-top:10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--text3)}
 .tw-stats b{color:var(--text2);font-weight:600}
-.tw-dots{display:flex;gap:5px;justify-content:center;padding:8px 0 11px;border-top:1px solid var(--line)}
+.tw-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px 9px;border-top:1px solid var(--line)}
+.tw-dots{display:flex;gap:5px;justify-content:center;flex:1}
 .tw-dots i{width:5px;height:5px;border-radius:50%;background:var(--line2);transition:.2s;cursor:pointer}
 .tw-dots i.on{background:var(--orange);width:16px;border-radius:10px}
+.tw-arw{width:26px;height:26px;flex:none;border-radius:8px;border:1px solid var(--line2);background:var(--card);display:flex;align-items:center;justify-content:center;transition:.15s;color:var(--text3)}
+.tw-arw:hover{border-color:var(--orange);color:var(--orange2);background:var(--orange-soft)}
+.tw-arw:active{transform:scale(.92)}
+.tw-arw svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
 /* journey: chapter rail + reading pane */
 .jr{display:grid;grid-template-columns:316px 1fr;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-sm);overflow:hidden}
@@ -895,6 +900,12 @@ input.err,.nf-row.err{animation:shake .4s}
   .sidebar{position:fixed;left:0;top:0;bottom:0;width:278px;transform:translateX(-102%);transition:transform .3s var(--ease);box-shadow:var(--shadow)}
   .sidebar.open{transform:none}
   .sb-toggle{display:flex !important}
+  /* sidebar X feed: text-only in the narrow drawer for a clean read */
+  .tw-media{display:none}
+  .tw-body,.tw-body.long{-webkit-line-clamp:7;font-size:12.5px;line-height:1.6}
+  .tw-card{padding:13px 14px 11px}
+  .tw-stats{margin-top:9px}
+  .tw-arw{width:30px;height:30px}
 }
 @media(max-width:760px){
   .wrap{padding:0 20px}
@@ -1290,7 +1301,11 @@ input.err,.nf-row.err{animation:shake .4s}
         </a>
         <div class="tw-slider" id="twSlider" onmouseenter="twPause()" onmouseleave="twResume()">
           <div class="tw-viewport" id="twViewport"></div>
-          <div class="tw-dots" id="twDots"></div>
+          <div class="tw-nav">
+            <button class="tw-arw" id="twPrevBtn" onclick="twPrev()" aria-label="Previous post"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <div class="tw-dots" id="twDots"></div>
+            <button class="tw-arw" id="twNextBtn" onclick="twNextManual()" aria-label="Next post"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
         </div>
       </div>
       <button class="sb-exit" onclick="exitApp()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/><path d="M10 12h10m0 0l-3.5-3.5M20 12l-3.5 3.5"/></svg>EXIT TO SITE</button>
@@ -1649,7 +1664,6 @@ const TWEETS=[
   {id:'1933312345678901248', t:'2H', body:'Tokenized treasuries just crossed $7.4B. The base layer of onchain finance is quietly settling in. 🐘', media:'tbill', likes:'412', rt:'88'},
   {id:'1932940012345678336', t:'1D', body:'New: RWAs explained in 5 minutes — wallets, stablecoins, vaults, trading and borrowing. Zero jargon, no homework. Read it, then come build with the Herd.', likes:'1.2K', rt:'306'},
   {id:'1932210987654321152', t:'3D', body:'WIP-07 voting opens Friday: treasury allocation bands, decided by the Herd. Your points are your voice.', media:'vote', likes:'540', rt:'121'},
-  {id:'1931884512345670000', t:'5D', body:'The right to financial services shouldn\'t depend on your passport or postcode. Onchain finance powered by RWAs is how we change that — for everyone, everywhere.', likes:'2.6K', rt:'714'},
 ];
 const TW_ILLU={
   tbill:'<svg class="tw-illu" viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="twg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF4EB"/><stop offset="1" stop-color="#FFE4CC"/></linearGradient></defs><rect width="320" height="180" fill="url(#twg1)"/><polyline points="0,140 50,120 100,128 150,92 200,104 250,60 320,40" fill="none" stroke="#FF6200" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="250" cy="60" r="5" fill="#FF6200"/><text x="20" y="36" font-family="ui-monospace,monospace" font-size="13" fill="#D85300" font-weight="700">TVL · $7.4B</text></svg>',
@@ -1673,6 +1687,8 @@ function twRender(dir){
   if(dots) dots.innerHTML=TWEETS.map((_,k)=>`<i class="${k===TW.i?'on':''}" onclick="twGo(${k})"></i>`).join('');
 }
 function twNext(){ TW.i=(TW.i+1)%TWEETS.length; twRender(); }
+function twNextManual(){ TW.i=(TW.i+1)%TWEETS.length; twRender(); twReset(); }
+function twPrev(){ TW.i=(TW.i-1+TWEETS.length)%TWEETS.length; twRender(); twReset(); }
 function twGo(k){ TW.i=k; twRender(); twReset(); }
 function twReset(){ if(TW.timer) clearInterval(TW.timer); TW.timer=setInterval(()=>{ if(!TW.paused) twNext(); }, 5200); }
 function twStart(){ if(!document.getElementById('twViewport')) return; TW.i=0; twRender(); twReset(); }
